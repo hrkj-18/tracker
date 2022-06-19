@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     personal_access_token: str
     organization_url: str
     query_id: str
+    secret_key: str
 
     class Config:
         env_file = ".env"
