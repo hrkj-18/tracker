@@ -1,0 +1,10 @@
+<a href="{% url 'dashboard:bulkcreate_IA' %}">Bulk Create IA Documents</a>
+{% if work_items_list %}
+    <ul>
+    {% for work_item in work_items_list %}
+        <li><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} {{ work_item.title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Work Items are available.</p>
+{% endif %}
