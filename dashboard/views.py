@@ -1,13 +1,16 @@
 from xml.etree.ElementTree import Comment
+from django.shortcuts import redirect, render
 from django.shortcuts import render
-from django.shortcuts import render
+from dashboard import urls
 from dashboard.doc_utils import create_doc
 from dashboard.excel_utils import create_excel
 
 from dashboard.models import WorkItem, Comment
 from .utils import get_work_items, Details
-
+from django.http import HttpResponseRedirect
 from dateutil import parser
+from django.urls import reverse
+
 # Create your views here.
 
 
@@ -72,7 +75,7 @@ def create_comment(request, pk):
             body=request.POST.get('body')
         )
 
-    return workitem(request, pk)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def update_comment(request, pk):
@@ -82,7 +85,7 @@ def update_comment(request, pk):
         comment.body = request.POST.get('body')
         comment.save()
 
-    return workitem(request, work_item.id)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def delete_comment(request, pk):
@@ -90,7 +93,7 @@ def delete_comment(request, pk):
     comment = comment_query.first()
     work_item = comment.work_item
     comment_query.delete()
-    return workitem(request, work_item.id)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 
@@ -119,7 +122,7 @@ def bulkcreate_IA(request):
             work_item.save()
         print(message)
 
-    return home(request)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def create_CR(request, pk):
