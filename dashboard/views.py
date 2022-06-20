@@ -10,6 +10,7 @@ from .utils import get_work_items, Details
 from django.http import HttpResponseRedirect
 from dateutil import parser
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_protect
 
 # Create your views here.
 
@@ -67,6 +68,7 @@ def workitem(request, pk):
     return render(request, 'dashboard/workitem.html', context)
 
 
+@csrf_protect
 def create_comment(request, pk):
     work_item = WorkItem.objects.get(id=pk)
     if request.method == 'POST':
@@ -78,6 +80,7 @@ def create_comment(request, pk):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+@csrf_protect
 def update_comment(request, pk):
     comment = Comment.objects.get(id=pk)
     work_item = comment.work_item
@@ -88,6 +91,7 @@ def update_comment(request, pk):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+@csrf_protect
 def delete_comment(request, pk):
     comment_query = Comment.objects.filter(id=pk)
     comment = comment_query.first()
