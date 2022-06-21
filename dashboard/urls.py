@@ -17,7 +17,8 @@ urlpatterns = [
     path('reset_IA/', views.reset_IA, name="reset_IA"),
 
     path('download/IA/', views.download_ia, name="download_ia"),
-    path('download/CR/', views.download_cr, name="download_cr")
+    path('download/CR/', views.download_cr, name="download_cr"),
+    path('download_ia/<str:filename>/', views.download_doc, name="download_doc"),
+    path('download_cr/<str:filename>/', views.download_excel, name="download_excel")
 
-    
 ]

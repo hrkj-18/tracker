@@ -1,3 +1,17 @@
+<script>
+    console.log(document)
+    const element = document.querySelector('[data-a="True"]');
+    console.log(element)
+    element.addEventListener("click", function() {
+        console.log("Entry")
+        const id = '#update_form_' + element.id
+        const formElement = document.querySelector(id)
+        formElement.hidden = true
+        console.log(element,formElement)
+	});
+
+</script>
+
 <a href="{% url 'dashboard:load_work_items' %}">Home</a><br>
 <a href="{% url 'dashboard:download_ia' %}">Download IA Documents</a><br>
 <a href="{% url 'dashboard:download_cr' %}">Download CR Documents</a><br>
@@ -12,14 +26,18 @@
         <ul>
         {% for work_item_comment in work_item_comments %}
         <li>
-            {{ work_item_comment.body }} {{ work_item_comment.created }} 
-            <a href="#">Update</a>
+            {{ work_item_comment.body }} {{ work_item_comment.created }} <br>   
+
+            <a href="#" id="{{ work_item_comment.id }}" data-a="True">Update</a><br>
+            <div id="update_form_{{ work_item_comment.id }}">
             <form action="{% url 'dashboard:update_comment' work_item_comment.id %}" method="post">
                 {% csrf_token %}
                 <input type="text" name="body" id="{{ work_item_comment.id }}" required>
                 <button type="submit">Submit</button>
-            </form> 
-            <a href="{% url 'dashboard:delete_comment' work_item_comment.id %}">Delete</a>
+            </form>
+            </div>
+
+            <a href="{% url 'dashboard:delete_comment' work_item_comment.id %}">Delete</a><br>
         </li>
         {% endfor %}
         </ul>

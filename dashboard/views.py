@@ -17,9 +17,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from zipfile import ZipFile
 
 # Create your views here.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-cr_path = 'file:///' + BASE_DIR + '\docs\CR'
-ia_path = 'file:///' + BASE_DIR + '\docs\IA'
+
 
 def home(request):
     work_items_list = WorkItem.objects.all()
@@ -172,12 +170,6 @@ def bulkcreate_IA(request):
         for IA_doc in created_IA_docs:
             zip_object.write(IA_doc)
 
-    # with open(filepath, 'rb') as worddoc:
-    # zip_file = open(path_to_file, 'r')
-    # response = HttpResponse(zip_file, content_type='application/force-download')
-    # response['Content-Disposition'] = 'attachment; filename="%s"' % 'foo.zip'
-    # return response
-
     if os.path.exists(zip_name):
         # !!Important read as binary!!
         with open(zip_name, 'rb') as zip_file:
@@ -239,8 +231,9 @@ def create_CR(request, pk):
 
 def download_ia(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = BASE_DIR + '/docs/IA/*.*'
-    files = glob(path)
+    path = BASE_DIR + '/docs/IA/'
+    files = os.listdir(path)
+    print(files)
     context = {
         'files': files
     }
@@ -249,13 +242,56 @@ def download_ia(request):
 
 def download_cr(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = BASE_DIR + '/docs/CR/*.*'
-    files = glob(path)
+    path = BASE_DIR + '/docs/CR/'
+    files = os.listdir(path)
+    print(files)
     context = {
         'files': files
     }
     return render(request, 'dashboard/cr_docs.html', context)
 
+
+def download_doc(request, filename):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = BASE_DIR + '/docs/IA/'
+    file_path = os.path.join(path, filename)
+
+    if os.path.exists(file_path):
+        # !!Important read as binary!!
+        if filename.split('.')[-1] == 'zip':
+            content_type = 'application/zip'
+        else:
+            content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        with open(file_path, 'rb') as worddoc:
+            content = worddoc.read()
+            response = HttpResponse(
+                content,
+                content_type=content_type
+            )
+            response['Content-Disposition'] = f'attachment; filename={filename}'
+            response['Content-Length'] = len(content)
+            return response
+    else:
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def download_excel(request, filename):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = BASE_DIR + '/docs/CR/'
+    file_path = os.path.join(path, filename)
+    print(file_path)
+    if os.path.exists(file_path):
+        # !!Important read as binary!!
+        with open(file_path, 'rb') as worddoc:
+            content = worddoc.read()
+            response = HttpResponse(
+                content,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename={filename}'
+            response['Content-Length'] = len(content)
+            return response
+    else:
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def reset_IA(request):
     work_items = WorkItem.objects.filter(has_IA=True)
