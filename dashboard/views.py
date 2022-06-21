@@ -239,7 +239,7 @@ def create_CR(request, pk):
 
 def download_ia(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = BASE_DIR + '\\docs\\IA\\*.*'
+    path = BASE_DIR + '/docs/IA/*.*'
     files = glob(path)
     context = {
         'files': files
@@ -249,7 +249,7 @@ def download_ia(request):
 
 def download_cr(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = BASE_DIR + '\\docs\\CR\\*.*'
+    path = BASE_DIR + '/docs/CR/*.*'
     files = glob(path)
     context = {
         'files': files
