@@ -1,4 +1,13 @@
-<a href="{% url 'dashboard:bulkcreate_IA' %}">Bulk Create IA Documents</a>
+<a href="{% url 'dashboard:load_work_items' %}">Refresh</a><br>
+<a href="{% url 'dashboard:reset_IA' %}">Reset IA Fields</a><br>
+<a href="{% url 'dashboard:bulkcreate_IA' %}">Bulk Create IA Documents</a><br>
+{% if bulk_message %}
+{{ bulk_message }}
+{% else %}
+{% endif %}
+<br>
+<a href="{% url 'dashboard:download_ia' %}">Download IA Documents</a><br>
+<a href="{% url 'dashboard:download_cr' %}">Download CR Documents</a><br>
 {% if work_items_list %}
     <ul>
     {% for work_item in work_items_list %}

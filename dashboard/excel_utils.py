@@ -10,11 +10,14 @@ def create_excel(work_item):
         title = work_item.title
         org = Details.ORGANIZATION
 
+        title = '-'.join(title.split(' '))
+        file_name = f"CR-{id}-{title}.xlsx"
+
         path = os.path.join(os.getcwd(), 'docs\\CR')
         if not os.path.exists(path):
             os.makedirs(path)
         template = os.path.join(path, "template.xlsx")
-        cr_excel = os.path.join(path, f"CR_{id}_{title}.xlsx")
+        cr_excel = os.path.join(path, file_name)
 
         shutil.copyfile(template, cr_excel)
 
@@ -30,9 +33,9 @@ def create_excel(work_item):
         sheet['A9'] = f"Description: {title}"
 
         workbook.save(cr_excel)
-
-        return "CR Document Created"
+        file_path = os.path.join(path, file_name)
+        return {'message': "CR Document Created",'file_path': file_path, 'file_name': file_name}
 
     except Exception as e:
         print(e)
-        return "Cannot Create Document"
+        return {'message': "Cannot Create Document",'file_path': None, 'file_name': None}

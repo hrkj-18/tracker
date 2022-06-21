@@ -1,24 +1,30 @@
+from glob import glob
+import mimetypes
+import os
 from xml.etree.ElementTree import Comment
 from django.shortcuts import redirect, render
 from django.shortcuts import render
-from dashboard import urls
 from dashboard.doc_utils import create_doc
 from dashboard.excel_utils import create_excel
 
 from dashboard.models import WorkItem, Comment
 from .utils import get_work_items, Details
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from dateutil import parser
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
-# Create your views here.
+from zipfile import ZipFile
 
+# Create your views here.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+cr_path = 'file:///' + BASE_DIR + '\docs\CR'
+ia_path = 'file:///' + BASE_DIR + '\docs\IA'
 
 def home(request):
     work_items_list = WorkItem.objects.all()
     context = {
-        'work_items_list': work_items_list,
+        'work_items_list': work_items_list
     }
     return render(request, 'dashboard/index.html', context)
 
@@ -82,8 +88,8 @@ def create_comment(request, pk):
 
 @csrf_exempt
 def update_comment(request, pk):
-    comment = Comment.objects.get(id=pk)
-    work_item = comment.work_item
+    comment_query = Comment.objects.filter(id=pk)
+    comment = comment_query.first()
     if request.method == 'POST':
         comment.body = request.POST.get('body')
         comment.save()
@@ -100,46 +106,160 @@ def delete_comment(request, pk):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-
 def create_IA(request, pk):
     work_item = WorkItem.objects.get(id=pk)
-    work_item_comments = work_item.comment_set.all()
-    message = create_doc(work_item)
-    if message:
+    doc_details = create_doc(work_item)
+
+    if doc_details['file_path'] is not None:
         work_item.has_IA = True
         work_item.save()
-    print(message)
-    context = {
-        'work_item': work_item,
-        'work_item_comments': work_item_comments,
-        'message_ia': message
-    }
-    return render(request, 'dashboard/workitem.html', context)
+
+        filename = doc_details['file_name']
+        filepath = doc_details['file_path']
+        if os.path.exists(filepath):
+            # !!Important read as binary!!
+            with open(filepath, 'rb') as worddoc:
+                content = worddoc.read()
+                response = HttpResponse(
+                    content,
+                    content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                )
+                response['Content-Disposition'] = f'attachment; filename={filename}'
+                response['Content-Length'] = len(content)
+                return response
+        else:
+            work_item_comments = work_item.comment_set.all()
+            context = {
+                'work_item': work_item,
+                'work_item_comments': work_item_comments,
+                'message_ia': doc_details['message']
+            }
+            return render(request, 'dashboard/workitem.html', context)
+
+    else:
+        work_item_comments = work_item.comment_set.all()
+        context = {
+            'work_item': work_item,
+            'work_item_comments': work_item_comments,
+            'message_ia': doc_details['message']
+        }
+        return render(request, 'dashboard/workitem.html', context)
 
 
 def bulkcreate_IA(request):
     work_items = WorkItem.objects.filter(has_IA=False)
+    created_IA_docs = []
     for work_item in work_items:
-        message = create_doc(work_item)
-        if message:
+        doc_details = create_doc(work_item)
+        if doc_details['file_path']:
+            created_IA_docs.append(doc_details['file_path'])
             work_item.has_IA = True
             work_item.save()
-        print(message)
+        print(doc_details['file_path'])
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    if len(created_IA_docs) == 0:
+        bulk_message = 'All IA Docs have already been generated'
+        work_items_list = WorkItem.objects.all()
+        context = {
+            'work_items_list': work_items_list,
+            'bulk_message': bulk_message
+        }
+        return render(request, 'dashboard/index.html', context)
+
+    path = os.path.join(os.getcwd(), 'docs\\IA')
+    zip_name = os.path.join(path, 'IA_Documents.zip')
+    with ZipFile(zip_name, 'w') as zip_object:
+        for IA_doc in created_IA_docs:
+            zip_object.write(IA_doc)
+
+    # with open(filepath, 'rb') as worddoc:
+    # zip_file = open(path_to_file, 'r')
+    # response = HttpResponse(zip_file, content_type='application/force-download')
+    # response['Content-Disposition'] = 'attachment; filename="%s"' % 'foo.zip'
+    # return response
+
+    if os.path.exists(zip_name):
+        # !!Important read as binary!!
+        with open(zip_name, 'rb') as zip_file:
+            content = zip_file.read()
+            response = HttpResponse(
+                content,
+                content_type='application/zip'
+            )
+            response['Content-Disposition'] = f'attachment; filename=IA_Documents.zip'
+            response['Content-Length'] = len(content)
+            return response
+    else:
+        bulk_message = "Couldn't download zip file"
+        work_items_list = WorkItem.objects.all()
+        context = {
+            'work_items_list': work_items_list,
+            'bulk_message': bulk_message
+        }
+        return render(request, 'dashboard/index.html', context)
 
 
 def create_CR(request, pk):
     work_item = WorkItem.objects.get(id=pk)
-    work_item_comments = work_item.comment_set.all()
-    message = create_excel(work_item)
-    if message:
+    doc_details = create_excel(work_item)
+    if doc_details['file_path'] is not None:
         work_item.has_CR = True
         work_item.save()
-    print(message)
+
+        filename = doc_details['file_name']
+        filepath = doc_details['file_path']
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as worddoc: # !!Important read as binary!!
+                content = worddoc.read()
+                response = HttpResponse(
+                    content,
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
+                response['Content-Disposition'] = f'attachment; filename={filename}'
+                response['Content-Length'] = len(content)
+                return response
+        else:
+            work_item_comments = work_item.comment_set.all()
+            context = {
+                'work_item': work_item,
+                'work_item_comments': work_item_comments,
+                'message_cr': doc_details['message']
+            }
+            return render(request, 'dashboard/workitem.html', context)
+
+    else:
+        work_item_comments = work_item.comment_set.all()
+        context = {
+            'work_item': work_item,
+            'work_item_comments': work_item_comments,
+            'message_cr': doc_details['message']
+        }
+        return render(request, 'dashboard/workitem.html', context)
+
+
+def download_ia(request):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = BASE_DIR + '\\docs\\IA\\*.*'
+    files = glob(path)
     context = {
-        'work_item': work_item,
-        'work_item_comments': work_item_comments,
-        'message_cr': message
+        'files': files
     }
-    return render(request, 'dashboard/workitem.html', context)
+    return render(request, 'dashboard/ia_docs.html', context)
+
+
+def download_cr(request):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = BASE_DIR + '\\docs\\CR\\*.*'
+    files = glob(path)
+    context = {
+        'files': files
+    }
+    return render(request, 'dashboard/cr_docs.html', context)
+
+
+def reset_IA(request):
+    work_items = WorkItem.objects.filter(has_IA=True)
+    for work_item in work_items:
+        work_item.has_IA = False
+        work_item.save()
+    return HttpResponseRedirect("/")

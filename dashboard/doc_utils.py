@@ -1,3 +1,4 @@
+# encoding: utf-8
 import os
 from dashboard.utils import Details
 from docx import Document
@@ -121,12 +122,14 @@ def create_doc(work_item):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        file_name = os.path.join(path, f"IA_{id}_{title}.docx")
+        title = '-'.join(title.split(' '))
+        file_name = f"IA-{id}-{title}.docx"
+        file_path = os.path.join(path, file_name)
 
-        document.save(file_name)
+        document.save(file_path)
 
-        return "IA Document Created"
+        return {'message': "IA Document Created",'file_path': file_path, 'file_name': file_name}
 
     except Exception as e:
         print(e)
-        return "Cannot Create Document"
+        return {'message': "Cannot Create Document",'file_path': None, 'file_name': None}

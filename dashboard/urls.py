@@ -13,5 +13,11 @@ urlpatterns = [
 
     path('create_IA/<str:pk>/', views.create_IA, name="create_IA"),
     path('create_CR/<str:pk>/', views.create_CR, name="create_CR"),
-    path('bulkcreate_IA/', views.bulkcreate_IA, name="bulkcreate_IA")
+    path('bulkcreate_IA/', views.bulkcreate_IA, name="bulkcreate_IA"),
+    path('reset_IA/', views.reset_IA, name="reset_IA"),
+
+    path('download/IA/', views.download_ia, name="download_ia"),
+    path('download/CR/', views.download_cr, name="download_cr")
+
+    
 ]

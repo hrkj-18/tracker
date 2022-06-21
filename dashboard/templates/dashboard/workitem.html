@@ -1,4 +1,6 @@
 <a href="{% url 'dashboard:load_work_items' %}">Home</a><br>
+<a href="{% url 'dashboard:download_ia' %}">Download IA Documents</a><br>
+<a href="{% url 'dashboard:download_cr' %}">Download CR Documents</a><br>
 {% if work_item %}
     {{ work_item.id }} {{ work_item.title }} {{ work_item.state }} <br>
     <a href="{% url 'dashboard:create_IA' work_item.id %}">Create IA</a>  
@@ -9,7 +11,16 @@
     {% if work_item_comments %}
         <ul>
         {% for work_item_comment in work_item_comments %}
-        <li>{{ work_item_comment.body }} {{ work_item_comment.created }} Update <a href="{% url 'dashboard:delete_comment' work_item_comment.id %}">Delete</a></li>
+        <li>
+            {{ work_item_comment.body }} {{ work_item_comment.created }} 
+            <a href="#">Update</a>
+            <form action="{% url 'dashboard:update_comment' work_item_comment.id %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="body" id="{{ work_item_comment.id }}" required>
+                <button type="submit">Submit</button>
+            </form> 
+            <a href="{% url 'dashboard:delete_comment' work_item_comment.id %}">Delete</a>
+        </li>
         {% endfor %}
         </ul>
         <p>Add comment</p> 
