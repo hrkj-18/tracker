@@ -1,8 +1,8 @@
-<script src=
-"https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
-    </script>
-<a href="{% url 'dashboard:load_work_items' %}">Home</a><br>
-CR Documents
+{% extends "base.html" %}
+{% load bootstrap4 %}
+{% block title %}CR Docs{% endblock title %}
+{% block content %}
+
 {% if files %}
     <ul>
     {% for file in files %}
@@ -13,3 +13,5 @@ CR Documents
 {% else %}
     <p>404</p>
 {% endif %}
+
+{% endblock content %}

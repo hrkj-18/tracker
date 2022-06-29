@@ -1,60 +1,52 @@
-<script>
-    console.log(document)
-    const element = document.querySelector('[data-a="True"]');
-    console.log(element)
-    element.addEventListener("click", function() {
-        console.log("Entry")
-        const id = '#update_form_' + element.id
-        const formElement = document.querySelector(id)
-        formElement.hidden = true
-        console.log(element,formElement)
-	});
+{% extends "base.html" %}
+{% load bootstrap4 %}
+{% block title %}Workitem - {{ work_item.id }}{% endblock title %}
+{% block content %}
 
-</script>
-
-<a href="{% url 'dashboard:load_work_items' %}">Home</a><br>
-<a href="{% url 'dashboard:download_ia' %}">Download IA Documents</a><br>
-<a href="{% url 'dashboard:download_cr' %}">Download CR Documents</a><br>
 {% if work_item %}
-    {{ work_item.id }} {{ work_item.title }} {{ work_item.state }} <br>
-    <a href="{% url 'dashboard:create_IA' work_item.id %}">Create IA</a>  
-    {% if message_ia %} {{ message_ia }} {% endif %}<br> 
-    <a href="{% url 'dashboard:create_CR' work_item.id %}">Create CR</a>
-    {% if message_cr %} {{ message_cr }} {% endif %} <br>
+    <div class="card" style="margin: 10px">
+        
+        <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5>
+        <div class="card-body">            
+            <div style="display: flex; flex-direction: row">
+                <h4 class="card-title"><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.title }}</a></h4>
+            </div>
+            <a href="{% url 'dashboard:create_IA' work_item.id %}" class="btn btn-primary">Create IA</a>
+            <a href="{% url 'dashboard:create_CR' work_item.id %}" class="btn btn-success">Create CR</a>
+        </div>
 
-    {% if work_item_comments %}
-        <ul>
-        {% for work_item_comment in work_item_comments %}
-        <li>
-            {{ work_item_comment.body }} {{ work_item_comment.created }} <br>   
-
-            <a href="#" id="{{ work_item_comment.id }}" data-a="True">Update</a><br>
-            <div id="update_form_{{ work_item_comment.id }}">
-            <form action="{% url 'dashboard:update_comment' work_item_comment.id %}" method="post">
+        {% if work_item_comments %}
+            <ul class="list-group list-group-flush">
+                {% for work_item_comment in work_item_comments %}
+                    <li class="list-group-item">
+                        {{ work_item_comment.body }} {{ work_item_comment.created }}
+                        <a href="#" id="{{ work_item_comment.id }}" data-toggle="collapse" data-target="#collapseExample_{{ work_item_comment.id }}" aria-expanded="false" aria-controls="collapseExample_{{ work_item_comment.id }}">Update</a>
+                        <a href="{% url 'dashboard:delete_comment' work_item_comment.id %}">Delete</a>
+                        <div class="collapse" id="collapseExample_{{ work_item_comment.id }}">
+                            <form action="{% url 'dashboard:update_comment' work_item_comment.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="text" name="body" id="{{ work_item_comment.id }}" required>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <div class="card-footer text-muted">
+            <p>Add comment</p>
+            <form action="{% url 'dashboard:create_comment' work_item.id %}" method="post">
                 {% csrf_token %}
                 <input type="text" name="body" id="{{ work_item_comment.id }}" required>
-                <button type="submit">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
-            </div>
+        </div>
+    
+    </div>
 
-            <a href="{% url 'dashboard:delete_comment' work_item_comment.id %}">Delete</a><br>
-        </li>
-        {% endfor %}
-        </ul>
-        <p>Add comment</p> 
-        <form action="{% url 'dashboard:create_comment' work_item.id %}" method="post">
-            {% csrf_token %}
-            <input type="text" name="body" id="{{ work_item_comment.id }}" required>
-            <button type="submit">Submit</button>
-        </form>
-    {% else %}
-        <p>Add comment</p>
-        <form action="{% url 'dashboard:create_comment' work_item.id %}" method="post">
-            {% csrf_token %}
-            <input type="text" name="body" id="{{ work_item_comment.id }}" required>
-            <button type="submit">Submit</button>
-        </form>
-    {% endif %}
 {% else %}
     <p>404</p>
 {% endif %}
+
+{% endblock content %}

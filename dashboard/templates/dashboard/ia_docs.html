@@ -1,8 +1,8 @@
-<script src=
-"https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
-    </script>
-<a href="{% url 'dashboard:load_work_items' %}">Home</a><br>
-IA Documents
+{% extends "base.html" %}
+{% load bootstrap4 %}
+{% block title %}IA Docs{% endblock title %}
+{% block content %}
+
 {% if files %}
     <ul>
     {% for file in files %}
@@ -14,3 +14,4 @@ IA Documents
     <p>404</p>
 {% endif %}
 
+{% endblock content %}

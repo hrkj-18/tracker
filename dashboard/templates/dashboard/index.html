@@ -1,19 +1,101 @@
-<a href="{% url 'dashboard:load_work_items' %}">Refresh</a><br>
-<a href="{% url 'dashboard:reset_IA' %}">Reset IA Fields</a><br>
-<a href="{% url 'dashboard:bulkcreate_IA' %}">Bulk Create IA Documents</a><br>
+{% extends "base.html" %}
+{% load bootstrap4 %}
+{% block title %}Tracker - Home{% endblock title %}
+{% block content %}
+
 {% if bulk_message %}
 {{ bulk_message }}
 {% else %}
 {% endif %}
-<br>
-<a href="{% url 'dashboard:download_ia' %}">Download IA Documents</a><br>
-<a href="{% url 'dashboard:download_cr' %}">Download CR Documents</a><br>
+
 {% if work_items_list %}
-    <ul>
-    {% for work_item in work_items_list %}
-        <li><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} {{ work_item.title }}</a></li>
-    {% endfor %}
-    </ul>
+<div class="container-fluid width-full">
+    <div class="row">
+        <div class="col-3">
+           New
+        </div>
+        <div class="col-3">
+            In Progress
+        </div>
+        <div class="col-3">
+            In Review
+        </div>
+        <div class="col-3">
+            Ready for Prod / Done
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">            
+            {% for work_item in work_items_list %}
+            {% if work_item.state == "New" %}
+                <div class="card">
+                    <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: row">
+                            <div class="card-title"><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} - {{ work_item.title }} - {{ work_item.state }}</a></div>
+                        </div>
+                        <a href="{% url 'dashboard:create_IA' work_item.id %}" class="btn btn-primary">Create IA</a>
+                        <a href="{% url 'dashboard:create_CR' work_item.id %}" class="btn btn-success">Create CR</a>
+                    </div>
+                </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div class="col-3">
+            {% for work_item in work_items_list %}
+            {% if work_item.state != "New" and work_item.state != "In Review" and work_item.state != "Done" and work_item.state != "Ready For Production" %}
+                <div class="card">
+                    <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: row">
+                            <div class="card-title"><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} - {{ work_item.title }} - {{ work_item.state }}</a></div>
+                        </div>
+                        <a href="{% url 'dashboard:create_IA' work_item.id %}" class="btn btn-primary">Create IA</a>
+                        <a href="{% url 'dashboard:create_CR' work_item.id %}" class="btn btn-success">Create CR</a>
+                    </div>
+                </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-3">
+            {% for work_item in work_items_list %}
+            {% if work_item.state == "In Review" %}
+                <div class="card">
+                    <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: row">
+                            <div class="card-title"><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} - {{ work_item.title }} - {{ work_item.state }}</a></div>
+                        </div>
+                        <a href="{% url 'dashboard:create_IA' work_item.id %}" class="btn btn-primary">Create IA</a>
+                        <a href="{% url 'dashboard:create_CR' work_item.id %}" class="btn btn-success">Create CR</a>
+                    </div>
+                </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-3">
+            {% for work_item in work_items_list %}
+            {% if work_item.state == "Done" or work_item.state == "Ready For Production"%}
+                <div class="card">
+                    <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: row">
+                            <div class="card-title"><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} - {{ work_item.title }} - {{ work_item.state }}</a></div>
+                        </div>
+                        <a href="{% url 'dashboard:create_IA' work_item.id %}" class="btn btn-primary">Create IA</a>
+                        <a href="{% url 'dashboard:create_CR' work_item.id %}" class="btn btn-success">Create CR</a>
+                    </div>
+                </div>
+            {% endif %}
+            {% endfor %}
+        </div>    
+    </div>
+</div>
 {% else %}
     <p>No Work Items are available.</p>
 {% endif %}
+
+{% endblock content %}

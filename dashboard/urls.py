@@ -4,7 +4,8 @@ from . import views
 app_name = 'dashboard'
 
 urlpatterns = [
-    path('', views.load_work_items, name="load_work_items"),
+    path('', views.home, name="home"),
+    path('load_work_items/', views.load_work_items, name="load_work_items"),
     path('workitem/<str:pk>/', views.workitem, name="workitem"),
 
     path('create_comment/<str:pk>/', views.create_comment, name="create_comment"),

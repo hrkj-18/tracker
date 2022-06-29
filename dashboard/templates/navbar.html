@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'dashboard:home' %}">Tracker</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard:home' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard:load_work_items' %}">Load Work Items</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard:reset_IA' %}">Reset IA Fields</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard:bulkcreate_IA' %}">Bulk Create IA Documents</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Download
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="{% url 'dashboard:download_ia' %}">Download IA Documents</a>
+            <a class="dropdown-item" href="{% url 'dashboard:download_cr' %}">Download CR Documents</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+</nav>
