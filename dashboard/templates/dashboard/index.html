@@ -11,23 +11,20 @@
 {% if work_items_list %}
 <div class="container-fluid width-full">
     <div class="row">
-        <div class="col-3">
+        <div class="col-4">
            New
         </div>
-        <div class="col-3">
+        <div class="col-4">
             In Progress
         </div>
-        <div class="col-3">
-            In Review
-        </div>
-        <div class="col-3">
-            Ready for Prod / Done
+        <div class="col-4">
+            Done
         </div>
     </div>
     <div class="row">
-        <div class="col-3">            
+        <div class="col-4">            
             {% for work_item in work_items_list %}
-            {% if work_item.state == "New" %}
+            {% if work_item.state == "To Do" %}
                 <div class="card">
                     <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
                     <div class="card-body">
@@ -42,9 +39,9 @@
             {% endfor %}
         </div>
         
-        <div class="col-3">
+        <div class="col-4">
             {% for work_item in work_items_list %}
-            {% if work_item.state != "New" and work_item.state != "In Review" and work_item.state != "Done" and work_item.state != "Ready For Production" %}
+            {% if work_item.state == "Doing" %}
                 <div class="card">
                     <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
                     <div class="card-body">
@@ -59,9 +56,9 @@
             {% endfor %}
         </div>
 
-        <div class="col-3">
+        <div class="col-4">
             {% for work_item in work_items_list %}
-            {% if work_item.state == "In Review" %}
+            {% if work_item.state == "Done" %}
                 <div class="card">
                     <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
                     <div class="card-body">
@@ -74,24 +71,7 @@
                 </div>
             {% endif %}
             {% endfor %}
-        </div>
-
-        <div class="col-3">
-            {% for work_item in work_items_list %}
-            {% if work_item.state == "Done" or work_item.state == "Ready For Production"%}
-                <div class="card">
-                    <!-- <h5 class="card-header">{{ work_item.id }} - {{ work_item.state }}</h5> -->
-                    <div class="card-body">
-                        <div style="display: flex; flex-direction: row">
-                            <div class="card-title"><a href="{% url 'dashboard:workitem' work_item.id %}">{{ work_item.id }} - {{ work_item.title }} - {{ work_item.state }}</a></div>
-                        </div>
-                        <a href="{% url 'dashboard:create_IA' work_item.id %}" class="btn btn-primary">Create IA</a>
-                        <a href="{% url 'dashboard:create_CR' work_item.id %}" class="btn btn-success">Create CR</a>
-                    </div>
-                </div>
-            {% endif %}
-            {% endfor %}
-        </div>    
+        </div> 
     </div>
 </div>
 {% else %}

@@ -14,6 +14,10 @@ class WorkItem(models.Model):
     created = models.DateTimeField(default=datetime.now())
     description = models.TextField(default='')
     owner = models.CharField(max_length=200, null=False, default='')
+    in_DM = models.BooleanField(default=0)
+    hours = models.IntegerField(default=0)
+    ad_work_package = models.CharField(max_length=50, null=False, default='')
+    '''owners end date'''
 
 
 class Comment(models.Model):

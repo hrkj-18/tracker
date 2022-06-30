@@ -104,6 +104,37 @@ def delete_comment(request, pk):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+def update_in_DM(request, pk):
+    work_item = WorkItem.objects.get(id=pk)
+    if request.method == 'POST':
+        comment = Comment.objects.create(
+            work_item=work_item,
+            body=request.POST.get('body')
+        )
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def update_hours(request, pk):
+    work_item = WorkItem.objects.get(id=pk)
+    if request.method == 'POST':
+        work_item.hours = int(request.POST.get('hours'))
+        work_item.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def update_ad_work_package(request, pk):
+    work_item = WorkItem.objects.get(id=pk)
+    if request.method == 'POST':
+        comment = Comment.objects.create(
+            work_item=work_item,
+            body=request.POST.get('body')
+        )
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 def create_IA(request, pk):
     work_item = WorkItem.objects.get(id=pk)
     doc_details = create_doc(work_item)
