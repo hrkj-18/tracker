@@ -26,6 +26,9 @@ def home(request):
     }
     return render(request, 'dashboard/index.html', context)
 
+def webhook(request):
+    if request.method == 'POST':
+        load_work_items(request)
 
 def load_work_items(request):
     work_items = get_work_items(
