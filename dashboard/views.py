@@ -26,7 +26,7 @@ def home(request):
     }
     return render(request, 'dashboard/index.html', context)
 
-
+@csrf_exempt
 def create_webhook(request):
     work_items = get_work_items(
         Details.PERSONAL_ACCESS_TOKEN,
