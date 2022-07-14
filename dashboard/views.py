@@ -26,9 +26,41 @@ def home(request):
     }
     return render(request, 'dashboard/index.html', context)
 
-def webhook(request):
-    if request.method == 'POST':
-        load_work_items(request)
+
+def create_webhook(request):
+    work_items = get_work_items(
+        Details.PERSONAL_ACCESS_TOKEN,
+        Details.ORGANIZATION_URL,
+        Details.QUERY_ID
+    )
+
+    for work_item_id, work_item in work_items.items():
+        try:
+            work_item_object = WorkItem.objects.get(id=work_item_id)
+            if work_item_object.title != work_item.fields['System.Title']:
+                work_item_object.title = work_item.fields['System.Title']
+                work_item_object.save()
+            if work_item_object.state != work_item.fields['System.State']:
+                work_item_object.state = work_item.fields['System.State']
+                work_item_object.save()
+            if work_item_object.description != work_item.fields['System.Description']:
+                work_item_object.description = work_item.fields['System.Description']
+                work_item_object.save()
+
+        except WorkItem.DoesNotExist:
+            datetime_string = work_item.fields['System.CreatedDate']
+            datetime_object = parser.isoparse(datetime_string)
+            work_item_object = WorkItem.objects.get_or_create(
+                id=work_item_id,
+                title=work_item.fields['System.Title'],
+                state=work_item.fields['System.State'],
+                created=datetime_object,
+                description=work_item.fields['System.Description'],
+                owner=work_item.fields['System.CreatedBy']['displayName']
+            )
+
+    return home(request)    
+
 
 def load_work_items(request):
     work_items = get_work_items(

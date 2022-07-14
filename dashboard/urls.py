@@ -6,7 +6,7 @@ app_name = 'dashboard'
 urlpatterns = [
     path('', views.home, name="home"),
     path('load_work_items/', views.load_work_items, name="load_work_items"),
-    path('webhook/', views.webhook, name="webhook"),
+    path('create_webhook/', views.create_webhook, name="create_webhook"),
     path('workitem/<str:pk>/', views.workitem, name="workitem"),
 
     path('create_comment/<str:pk>/', views.create_comment, name="create_comment"),
